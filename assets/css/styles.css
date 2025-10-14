@@ -1,0 +1,192 @@
+/* CSS variables for theme */
+:root {
+  --sq-header-height: 80px;
+  --sq-glass-bg: rgba(255, 255, 255, 0.6);
+  --sq-glass-border: rgba(255, 255, 255, 0.45);
+  --sq-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --sq-primary: #0d6efd;
+  --sq-success: #198754;
+  --sq-muted: #6c757d;
+  --sq-step-active: #0d6efd;
+  --sq-step-inactive: #dee2e6;
+}
+
+html, body {
+  scroll-behavior: smooth;
+}
+
+/* Header glassmorphism */
+.sq-header {
+  height: var(--sq-header-height);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: var(--sq-glass-bg);
+  border-bottom: 1px solid var(--sq-glass-border);
+  box-shadow: var(--sq-shadow);
+}
+
+.sq-header .navbar-brand {
+  user-select: none;
+}
+
+.sq-tabs .nav-link {
+  border-radius: 999px;
+  padding: 0.5rem 0.875rem;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.sq-tabs .nav-link.active,
+.sq-tabs .nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.12);
+  color: var(--sq-primary);
+}
+
+/* Progress indicator */
+.sq-progress {
+  gap: 8px;
+}
+
+.sq-progress .sq-stage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sq-muted);
+}
+
+.sq-progress .sq-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #adb5bd; /* gray for incomplete */
+  outline: 3px solid rgba(0,0,0,0.04);
+}
+
+.sq-progress .sq-label {
+  font-size: 0.85rem;
+}
+
+.sq-progress .sq-connector {
+  width: 32px;
+  height: 2px;
+  background: linear-gradient(90deg, #dee2e6 0%, #ced4da 100%);
+}
+
+.sq-progress .sq-stage.in-progress .sq-dot { background-color: var(--sq-primary); }
+.sq-progress .sq-stage.complete .sq-dot { background-color: var(--sq-success); }
+.sq-progress .sq-stage.in-progress .sq-label { color: var(--sq-primary); }
+.sq-progress .sq-stage.complete .sq-label { color: var(--sq-success); }
+
+.sq-progress .sq-percentage {
+  font-weight: 600;
+}
+
+/* Map */
+.sq-map {
+  min-height: 340px;
+  width: 100%;
+  background: #f8f9fa;
+}
+
+/* Results cards */
+.sq-card {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.sq-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+/* Canvas */
+.sq-canvas {
+  min-height: 420px;
+  background: repeating-linear-gradient(
+      45deg,
+      #f8f9fa,
+      #f8f9fa 10px,
+      #ffffff 10px,
+      #ffffff 20px
+  );
+  border: 1px dashed #ced4da;
+  overflow: auto;
+  position: relative;
+}
+
+.sq-canvas .sq-block {
+  border-radius: 0.75rem;
+  border: 1px solid #e9ecef;
+  box-shadow: var(--sq-shadow);
+  padding: 18px;
+  margin: 10px;
+  background: #fff;
+}
+
+.sq-canvas .sq-block[contenteditable="true"]:focus {
+  outline: 2px solid rgba(13,110,253,0.3);
+}
+
+/* Drag and drop feedback */
+.sq-canvas.drag-over {
+  border-color: var(--sq-primary);
+  box-shadow: 0 0 0 4px rgba(13,110,253,0.1) inset;
+}
+
+/* Utilities */
+.shadow-soft {
+  box-shadow: var(--sq-shadow);
+}
+
+@media (max-width: 991.98px) {
+  .sq-progress .sq-label { display: none; }
+  .sq-progress .sq-connector { width: 20px; }
+}
+
+/* Stepper */
+.sq-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.sq-stepper .sq-step {
+  background: #fff;
+  border: 1px solid var(--sq-step-inactive);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sq-stepper .sq-step .sq-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sq-step-inactive);
+  color: #495057;
+  font-weight: 600;
+}
+.sq-stepper .sq-step.active {
+  border-color: var(--sq-step-active);
+}
+.sq-stepper .sq-step.active .sq-step-num {
+  background: var(--sq-step-active);
+  color: #fff;
+}
+
+/* Estimator cards */
+.sq-card-select {
+  cursor: pointer;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+.sq-card-select:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
+.sq-card-select.active { border-color: var(--sq-primary); box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15); }
+
+.sq-feature-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 10px; border: 1px solid #e9ecef; border-radius: 10px; margin-bottom: 8px;
+}
+
+
