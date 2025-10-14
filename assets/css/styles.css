@@ -15,6 +15,23 @@ html, body {
   scroll-behavior: smooth;
 }
 
+body {
+  line-height: 1.6;
+}
+
+/* Whitespace & layout helpers */
+.sq-section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+@media (min-width: 768px) {
+  .sq-section { padding-top: 5rem; padding-bottom: 5rem; }
+}
+.sq-stack-lg > * + * { margin-top: 1rem; }
+@media (min-width: 768px) { .sq-stack-lg > * + * { margin-top: 1.25rem; } }
+.sq-lead-area { margin-bottom: 1.25rem; }
+@media (min-width: 992px) { .sq-lead-area { margin-bottom: 2rem; } }
+
 /* Header glassmorphism */
 .sq-header {
   height: var(--sq-header-height);
@@ -99,6 +116,10 @@ html, body {
   box-shadow: 0 12px 28px rgba(0,0,0,0.08);
 }
 
+/* Slightly roomier card content for readability */
+.card > .card-body { padding: 1.25rem; }
+@media (min-width: 992px) { .card > .card-body { padding: 1.5rem; } }
+
 /* Canvas */
 .sq-canvas {
   min-height: 420px;
@@ -161,7 +182,7 @@ html, body {
 .progress-smooth { transition: width 300ms ease-in-out; }
 
 /* Bottom navigation & FAB */
-.sq-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e9ecef; z-index: 1040; }
+.sq-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e9ecef; z-index: 1040; display: none; }
 .sq-bottom-nav .nav-link { padding: 10px 4px; font-size: 12px; }
 .sq-fab { position: fixed; bottom: 76px; right: 16px; z-index: 1040; border-radius: 999px; box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
 

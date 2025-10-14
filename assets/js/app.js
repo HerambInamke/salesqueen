@@ -427,6 +427,27 @@
     SalesQueenStorage.save(project);
   }
 
+  // Mobile FAB behavior: quick scroll to active phase or add CTA on design
+  const fab = document.getElementById('fab-action');
+  if (fab) {
+    function updateFabVisibility() {
+      const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+      fab.classList.toggle('d-none', !isMobile);
+    }
+    updateFabVisibility();
+    window.addEventListener('resize', updateFabVisibility);
+    fab.addEventListener('click', () => {
+      // If on design, add CTA; else scroll to quote
+      const onDesign = location.hash === '#phase-design' || document.activeElement.closest && document.activeElement.closest('#phase-design');
+      if (onDesign && canvas) {
+        addBlockToCanvas('cta');
+        (window.SQ_toast || ((m)=>alert(m)))('CTA added to canvas.', 'text-bg-success');
+      } else {
+        document.getElementById('phase-quote').scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+
   // Map placeholder + simple interaction
   const searchBtn = document.getElementById('btn-search');
   const placeInput = document.getElementById('place-input');
