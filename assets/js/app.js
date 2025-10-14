@@ -213,6 +213,8 @@
     bsToast.show();
     toast.addEventListener('hidden.bs.toast', () => toast.remove());
   }
+  // Expose globally for other modules (e.g., estimator)
+  window.SQ_toast = showToast;
 
   // Ripple effect for buttons
   document.body.addEventListener('click', (e) => {

@@ -222,7 +222,7 @@
 
   // Quote export/share/email
   document.getElementById('btn-generate-quote')?.addEventListener('click', () => {
-    showToast('Quote ready. You can print or share now.', 'text-bg-success');
+    (window.SQ_toast || ((m)=>alert(m)))('Quote ready. You can print or share now.', 'text-bg-success');
     window.scrollTo({ top: document.getElementById('phase-quote').offsetTop, behavior: 'smooth' });
   });
   document.getElementById('btn-print-quote')?.addEventListener('click', () => window.print());
