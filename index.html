@@ -134,7 +134,7 @@
               </div>
             </div>
 
-            <div id="results" class="row row-cols-1 row-cols-md-2 g-3"></div>
+            <div id="results" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3"></div>
 
             <div class="card mt-4 shadow-sm border-0">
               <div class="card-body">
@@ -317,35 +317,118 @@
       <!-- Phase 3: Design Preview -->
       <section id="phase-design" class="container-xxl py-5">
         <h2 class="h4 mb-3">Design Preview</h2>
-        <p class="text-secondary mb-4">Create interactive website design previews. Drag components onto the canvas.</p>
+        <p class="text-secondary mb-4">Create interactive website design previews. Drag components onto the canvas and customize styles in real time.</p>
         <div class="row g-4">
-          <div class="col-12 col-lg-4">
+          <!-- Library -->
+          <div class="col-12 col-xl-3">
             <div class="card h-100 shadow-sm border-0">
               <div class="card-body">
-                <h5 class="card-title">Components</h5>
-                <div class="d-grid gap-2" id="component-palette">
-                  <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="hero"><i class="fa-regular fa-image me-2"></i>Hero Banner</button>
-                  <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="features"><i class="fa-solid fa-grid-2 me-2"></i>Features Grid</button>
-                  <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="testimonials"><i class="fa-regular fa-comments me-2"></i>Testimonials</button>
-                  <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="cta"><i class="fa-solid fa-bullhorn me-2"></i>Call to Action</button>
+                <h5 class="card-title">Component Library</h5>
+                <div class="accordion" id="library-accordion">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="lib-head">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#lib-headers" aria-expanded="true">Headers</button>
+                    </h2>
+                    <div id="lib-headers" class="accordion-collapse collapse show" data-bs-parent="#library-accordion">
+                      <div class="accordion-body d-grid gap-2" id="component-palette-headers">
+                        <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="hero"><i class="fa-regular fa-image me-2"></i>Hero Header</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#lib-content">Content Sections</button>
+                    </h2>
+                    <div id="lib-content" class="accordion-collapse collapse" data-bs-parent="#library-accordion">
+                      <div class="accordion-body d-grid gap-2" id="component-palette-content">
+                        <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="features"><i class="fa-solid fa-grid-2 me-2"></i>Features Grid</button>
+                        <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="testimonials"><i class="fa-regular fa-comments me-2"></i>Testimonials</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#lib-cta">Call To Action</button>
+                    </h2>
+                    <div id="lib-cta" class="accordion-collapse collapse" data-bs-parent="#library-accordion">
+                      <div class="accordion-body d-grid gap-2" id="component-palette-cta">
+                        <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="cta"><i class="fa-solid fa-bullhorn me-2"></i>Primary CTA</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#lib-footers">Footers</button>
+                    </h2>
+                    <div id="lib-footers" class="accordion-collapse collapse" data-bs-parent="#library-accordion">
+                      <div class="accordion-body d-grid gap-2" id="component-palette-footers">
+                        <button class="btn btn-outline-secondary sq-draggable" draggable="true" data-type="footer"><i class="fa-regular fa-rectangle-list me-2"></i>Simple Footer</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-12 col-lg-8">
+          <!-- Canvas -->
+          <div class="col-12 col-xl-6">
             <div class="card h-100 shadow-sm border-0">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <h5 class="card-title mb-0">Canvas</h5>
-                  <div class="btn-group btn-group-sm" role="group" aria-label="canvas zoom">
-                    <button class="btn btn-outline-secondary" data-zoom="out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-                    <button class="btn btn-outline-secondary" data-zoom="reset">100%</button>
-                    <button class="btn btn-outline-secondary" data-zoom="in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                  <div class="btn-toolbar gap-2">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="device preview">
+                      <button class="btn btn-outline-secondary" data-device="desktop" title="Desktop">Desktop</button>
+                      <button class="btn btn-outline-secondary" data-device="tablet" title="Tablet">Tablet</button>
+                      <button class="btn btn-outline-secondary" data-device="mobile" title="Mobile">Mobile</button>
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="canvas zoom">
+                      <button class="btn btn-outline-secondary" data-zoom="out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                      <button class="btn btn-outline-secondary" data-zoom="reset">100%</button>
+                      <button class="btn btn-outline-secondary" data-zoom="in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="export">
+                      <button class="btn btn-outline-primary" id="btn-export-html" title="Export HTML"><i class="fa-solid fa-file-code"></i></button>
+                    </div>
                   </div>
                 </div>
-                <div id="design-canvas" class="sq-canvas rounded-4" tabindex="0" aria-label="Design canvas" data-empty="true">
-                  <div class="text-center text-secondary p-4 small">Drag components here</div>
+                <div class="sq-canvas-wrap" data-device="desktop">
+                  <div id="design-canvas" class="sq-canvas rounded-4" tabindex="0" aria-label="Design canvas" data-empty="true">
+                    <div class="text-center text-secondary p-4 small">Drag components here</div>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <!-- Settings -->
+          <div class="col-12 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body">
+                <h5 class="card-title">Style & Settings</h5>
+                <form id="style-form" class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label">Background</label>
+                    <input type="color" class="form-control form-control-color" id="style-bg" value="#ffffff">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Text Color</label>
+                    <input type="color" class="form-control form-control-color" id="style-color" value="#212529">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">Padding (px)</label>
+                    <input type="number" class="form-control" id="style-padding" min="0" max="200" step="4" value="18">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">Font Size (px)</label>
+                    <input type="number" class="form-control" id="style-font" min="12" max="48" step="1" value="16">
+                  </div>
+                  <div class="col-12">
+                    <button type="button" id="style-apply" class="btn btn-sm btn-primary">Apply to Selection</button>
+                  </div>
+                  <div class="col-12">
+                    <div class="small text-secondary" id="style-selection-hint">Select a block on the canvas to edit.</div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -359,6 +442,18 @@
         <div class="small"><a href="#phase-find" class="link-secondary text-decoration-none">Back to top</a></div>
       </div>
     </footer>
+
+    <!-- Mobile bottom navigation -->
+    <nav class="sq-bottom-nav d-none">
+      <ul class="nav justify-content-around align-items-center">
+        <li class="nav-item"><a class="nav-link text-center" href="#phase-find"><i class="fa-solid fa-location-dot d-block"></i><span class="small">Find</span></a></li>
+        <li class="nav-item"><a class="nav-link text-center" href="#phase-quote"><i class="fa-solid fa-calculator d-block"></i><span class="small">Quote</span></a></li>
+        <li class="nav-item"><a class="nav-link text-center" href="#phase-design"><i class="fa-solid fa-pen-ruler d-block"></i><span class="small">Design</span></a></li>
+      </ul>
+    </nav>
+
+    <!-- Floating action button (mobile primary action) -->
+    <button class="btn btn-primary sq-fab d-none d-md-none" id="fab-action" title="Primary Action"><i class="fa-solid fa-plus"></i></button>
 
     <!-- Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

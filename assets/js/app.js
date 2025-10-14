@@ -214,14 +214,80 @@
     toast.addEventListener('hidden.bs.toast', () => toast.remove());
   }
 
+  // Ripple effect for buttons
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn');
+    if (!btn) return;
+    const ripple = document.createElement('span');
+    ripple.style.position = 'absolute';
+    ripple.style.borderRadius = '50%';
+    ripple.style.transform = 'scale(0)';
+    ripple.style.opacity = '0.4';
+    ripple.style.pointerEvents = 'none';
+    ripple.style.background = 'currentColor';
+    ripple.style.transition = 'transform 300ms ease, opacity 300ms ease';
+    const rect = btn.getBoundingClientRect();
+    ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
+    ripple.style.left = (e.clientX - rect.left - rect.width/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - rect.height/2) + 'px';
+    btn.style.position = 'relative';
+    btn.appendChild(ripple);
+    requestAnimationFrame(() => {
+      ripple.style.transform = 'scale(1)';
+      ripple.style.opacity = '0';
+    });
+    setTimeout(() => ripple.remove(), 350);
+  }, true);
+
+  // Drag visual effects
+  document.addEventListener('dragstart', (e) => {
+    const draggable = e.target.closest('.sq-draggable, .sq-block');
+    if (draggable) draggable.classList.add('dragging');
+  });
+  document.addEventListener('dragend', (e) => {
+    const draggable = e.target.closest('.sq-draggable, .sq-block');
+    if (draggable) draggable.classList.remove('dragging');
+  });
+
+  // Mobile collapsible sections (use Bootstrap collapse by data attributes if needed)
+  // Example: collapse estimator groups on small screens – handled via layout; extend as required.
+
+  // Count-up animation for estimator totals
+  function animateNumber(el, to, duration = 1000) {
+    const from = Number((el.textContent || '0').replace(/[^0-9]/g, '')) || 0;
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min(1, (now - start) / duration);
+      const v = Math.round(from + (to - from) * p);
+      el.textContent = '₹' + v.toLocaleString('en-IN');
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  // Hook estimator totals for animation
+  const subtotalEl = document.getElementById('estimate-subtotal');
+  const gstEl = document.getElementById('estimate-gst');
+  const totalEl = document.getElementById('estimate-total');
+  const _setText = (el, val) => { if (!el) return; animateNumber(el, val); };
+  document.addEventListener('sq-estimate-updated', (e) => {
+    const { modified, gst, total } = e.detail || {};
+    _setText(subtotalEl, modified || 0);
+    _setText(gstEl, gst || 0);
+    _setText(totalEl, total || 0);
+  });
+
   // Drag & Drop for Design Canvas
   const palette = document.getElementById('component-palette');
   const canvas = document.getElementById('design-canvas');
-  if (palette && canvas) {
-    palette.addEventListener('dragstart', (e) => {
-      const target = e.target.closest('.sq-draggable');
-      if (!target) return;
-      e.dataTransfer.setData('text/plain', target.getAttribute('data-type'));
+  // multiple palettes (accordion sections)
+  const allPalettes = document.querySelectorAll('[id^="component-palette-"]');
+  if (canvas) {
+    [palette, ...allPalettes].filter(Boolean).forEach(pal => {
+      pal.addEventListener('dragstart', (e) => {
+        const target = e.target.closest('.sq-draggable');
+        if (!target) return;
+        e.dataTransfer.setData('text/plain', target.getAttribute('data-type'));
+      });
     });
 
     canvas.addEventListener('dragover', (e) => {
@@ -247,6 +313,8 @@
     block.innerHTML = getDefaultBlockHtml(type);
     canvas.appendChild(block);
     canvas.dataset.empty = 'false';
+    enableBlockInteractions(block);
+    persistDesign();
   }
 
   function getDefaultBlockHtml(type) {
@@ -259,9 +327,102 @@
         return '<h4>Testimonials</h4><blockquote>“Great service!” — Happy Client</blockquote>';
       case 'cta':
         return '<h4>Call to Action</h4><button class="btn btn-primary">Get Started</button>';
+      case 'footer':
+        return '<p class="mb-0">© Your Company</p>';
       default:
         return '<p>New block</p>';
     }
+  }
+
+  // Selection and styling
+  let selectedBlock = null;
+  function enableBlockInteractions(block) {
+    block.addEventListener('click', (e) => {
+      selectBlock(block);
+    });
+    block.setAttribute('draggable', 'true');
+    block.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/block-index', [...canvas.querySelectorAll('.sq-block')].indexOf(block));
+    });
+  }
+  function selectBlock(block) {
+    canvas.querySelectorAll('.sq-block').forEach(b => b.classList.remove('selected'));
+    selectedBlock = block;
+    block.classList.add('selected');
+    const hint = document.getElementById('style-selection-hint');
+    if (hint) hint.textContent = `Editing: ${block.dataset.type}`;
+  }
+
+  // Reorder inside canvas
+  if (canvas) {
+    canvas.addEventListener('dragover', (e) => {
+      // allow internal reorder by dropping before/after
+      if (e.dataTransfer.types.includes('text/block-index')) e.preventDefault();
+    });
+    canvas.addEventListener('drop', (e) => {
+      const fromIndex = e.dataTransfer.getData('text/block-index');
+      if (fromIndex !== '') {
+        const blocks = [...canvas.querySelectorAll('.sq-block')];
+        const from = blocks[Number(fromIndex)];
+        const to = e.target.closest('.sq-block');
+        if (from && to && from !== to) {
+          canvas.insertBefore(from, to);
+          persistDesign();
+        }
+      }
+    });
+    // enable interactions for preloaded blocks
+    canvas.querySelectorAll('.sq-block').forEach(enableBlockInteractions);
+  }
+
+  // Style form
+  const styleForm = document.getElementById('style-form');
+  const styleApply = document.getElementById('style-apply');
+  if (styleForm && styleApply) {
+    styleApply.addEventListener('click', () => {
+      if (!selectedBlock) { showToast('Select a block to style.'); return; }
+      const bg = document.getElementById('style-bg').value;
+      const color = document.getElementById('style-color').value;
+      const padding = Number(document.getElementById('style-padding').value || 0);
+      const font = Number(document.getElementById('style-font').value || 16);
+      selectedBlock.style.backgroundColor = bg;
+      selectedBlock.style.color = color;
+      selectedBlock.style.padding = `${padding}px`;
+      selectedBlock.style.fontSize = `${font}px`;
+      persistDesign();
+    });
+  }
+
+  // Device preview
+  const wrap = document.querySelector('.sq-canvas-wrap');
+  document.querySelectorAll('[data-device]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      wrap && wrap.setAttribute('data-device', btn.getAttribute('data-device'));
+    });
+  });
+
+  // Export HTML
+  const exportHtmlBtn = document.getElementById('btn-export-html');
+  exportHtmlBtn && exportHtmlBtn.addEventListener('click', () => {
+    const html = generateCanvasHtml();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'salesqueen_layout.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  function generateCanvasHtml() {
+    const content = [...canvas.querySelectorAll('.sq-block')].map(b => `<section data-type="${b.dataset.type}" style="${b.getAttribute('style')||''}">${b.innerHTML}</section>`).join('\n');
+    return `<!doctype html>\n<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SalesQueen Layout</title></head><body>${content}</body></html>`;
+  }
+
+  function persistDesign() {
+    const project = SalesQueenStorage.load() || {};
+    const blocks = [...canvas.querySelectorAll('.sq-block')].map(b => ({ type: b.dataset.type, html: b.innerHTML, style: b.getAttribute('style') || '' }));
+    project.design = { blocks };
+    SalesQueenStorage.save(project);
   }
 
   // Map placeholder + simple interaction
@@ -299,9 +460,12 @@
         block.dataset.type = b.type;
         block.contentEditable = 'true';
         block.innerHTML = b.html;
+        if (b.style) block.setAttribute('style', b.style);
         canvas.appendChild(block);
       });
       if (saved.design.blocks.length) canvas.dataset.empty = 'false';
+      // re-enable interactions after restore
+      canvas.querySelectorAll('.sq-block').forEach(enableBlockInteractions);
     }
     if (saved.find && saved.find.query && placeInput) {
       placeInput.value = saved.find.query;

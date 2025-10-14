@@ -181,6 +181,9 @@
     gstEl.textContent = formatINR(gst);
     totalEl.textContent = formatINR(total);
 
+    // dispatch event for animated numbers
+    document.dispatchEvent(new CustomEvent('sq-estimate-updated', { detail: { modified, gst, total } }));
+
     // Chart
     renderChart([
       { label: 'Base', amount: base },
