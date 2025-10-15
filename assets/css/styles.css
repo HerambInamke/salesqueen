@@ -19,18 +19,52 @@ body {
   line-height: 1.6;
 }
 
-/* Whitespace & layout helpers */
+/* Enhanced whitespace & layout helpers */
 .sq-section {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
 }
 @media (min-width: 768px) {
-  .sq-section { padding-top: 5rem; padding-bottom: 5rem; }
+  .sq-section { padding-top: 6rem; padding-bottom: 6rem; }
 }
-.sq-stack-lg > * + * { margin-top: 1rem; }
-@media (min-width: 768px) { .sq-stack-lg > * + * { margin-top: 1.25rem; } }
-.sq-lead-area { margin-bottom: 1.25rem; }
-@media (min-width: 992px) { .sq-lead-area { margin-bottom: 2rem; } }
+@media (min-width: 1200px) {
+  .sq-section { padding-top: 7rem; padding-bottom: 7rem; }
+}
+
+.sq-stack-lg > * + * { margin-top: 1.5rem; }
+@media (min-width: 768px) { .sq-stack-lg > * + * { margin-top: 2rem; } }
+.sq-lead-area { margin-bottom: 2rem; }
+@media (min-width: 992px) { .sq-lead-area { margin-bottom: 3rem; } }
+
+/* Clean spacing utilities */
+.sq-spacing-sm { margin-bottom: 1rem; }
+.sq-spacing-md { margin-bottom: 2rem; }
+.sq-spacing-lg { margin-bottom: 3rem; }
+.sq-spacing-xl { margin-bottom: 4rem; }
+
+/* Enhanced typography */
+.sq-hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+@media (min-width: 768px) {
+  .sq-hero-title { font-size: 3.5rem; }
+}
+@media (min-width: 1200px) {
+  .sq-hero-title { font-size: 4rem; }
+}
+
+.sq-hero-subtitle {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+@media (min-width: 768px) {
+  .sq-hero-subtitle { font-size: 1.25rem; }
+}
 
 /* Header glassmorphism */
 .sq-header {
@@ -116,9 +150,34 @@ body {
   box-shadow: 0 12px 28px rgba(0,0,0,0.08);
 }
 
-/* Slightly roomier card content for readability */
-.card > .card-body { padding: 1.25rem; }
-@media (min-width: 992px) { .card > .card-body { padding: 1.5rem; } }
+/* Enhanced card styling */
+.card { 
+  border-radius: 16px; 
+  border: 1px solid #f1f3f4;
+  transition: all 200ms ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.card > .card-body { 
+  padding: 1.5rem; 
+}
+@media (min-width: 992px) { 
+  .card > .card-body { 
+    padding: 2rem; 
+  } 
+}
+
+/* Clean section backgrounds */
+.bg-body-tertiary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Enhanced spacing for better visual hierarchy */
+.sq-section + .sq-section {
+  border-top: 1px solid #f1f3f4;
+}
 
 /* Canvas */
 .sq-canvas {
@@ -251,19 +310,65 @@ body {
   color: #fff;
 }
 
-/* Estimator cards */
+/* Enhanced cards and components */
 .sq-card-select {
   cursor: pointer;
   border: 1px solid #e9ecef;
-  border-radius: 12px;
-  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 200ms ease;
+  background: #fff;
 }
-.sq-card-select:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
-.sq-card-select.active { border-color: var(--sq-primary); box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15); }
+.sq-card-select:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08); 
+  border-color: var(--sq-primary);
+}
+.sq-card-select.active { 
+  border-color: var(--sq-primary); 
+  box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+  background: rgba(13,110,253,.02);
+}
 
 .sq-feature-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 8px 10px; border: 1px solid #e9ecef; border-radius: 10px; margin-bottom: 8px;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 16px;
+  padding: 1rem 1.25rem; 
+  border: 1px solid #e9ecef; 
+  border-radius: 12px; 
+  margin-bottom: 12px;
+  background: #fff;
+  transition: all 150ms ease;
+}
+.sq-feature-item:hover {
+  border-color: var(--sq-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Clean form styling */
+.form-control, .form-select {
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  transition: all 150ms ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--sq-primary);
+  box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+}
+
+/* Enhanced buttons */
+.btn {
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 150ms ease;
+}
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
 }
 
 

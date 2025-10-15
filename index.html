@@ -101,16 +101,16 @@
       <!-- Phase 1: Find Business -->
       <section id="phase-find" class="container-xxl sq-section">
         <div class="row g-5 align-items-start">
-          <div class="col-12">
-            <h1 class="display-6 fw-semibold mb-2">Discover Your Digital Potential</h1>
-            <p class="text-secondary sq-lead-area">Find your business and explore how we can transform your online presence</p>
+          <div class="col-12 text-center">
+            <h1 class="sq-hero-title">Discover Your Digital Potential</h1>
+            <p class="sq-hero-subtitle">Find your business and explore how we can transform your online presence</p>
           </div>
           <div class="col-12 col-xl-7">
-            <div class="row g-2 align-items-stretch mb-3">
+            <div class="row g-3 align-items-stretch mb-4">
               <div class="col-12 col-md-8">
                 <div class="input-group input-group-lg">
-                  <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                  <input id="place-input" type="text" class="form-control" placeholder="Business name, address, or city" aria-label="Search location">
+                  <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                  <input id="place-input" type="text" class="form-control border-start-0" placeholder="Business name, address, or city" aria-label="Search location">
                   <button class="btn btn-outline-secondary" id="btn-geolocate" type="button" title="Use my location"><i class="fa-solid fa-location-crosshairs"></i></button>
                 </div>
               </div>
@@ -127,20 +127,25 @@
                 </select>
               </div>
             </div>
-            <div class="d-flex gap-2 mb-3">
-              <button class="btn btn-primary" id="btn-search" type="button">Search</button>
+            <div class="d-flex gap-3 mb-4">
+              <button class="btn btn-primary btn-lg" id="btn-search" type="button">
+                <i class="fa-solid fa-magnifying-glass me-2"></i>Search
+              </button>
               <div class="btn-group" role="group" aria-label="Map view">
-                <button class="btn btn-outline-secondary" id="btn-view-map" type="button"><i class="fa-regular fa-map"></i> Map</button>
-                <button class="btn btn-outline-secondary" id="btn-view-satellite" type="button"><i class="fa-regular fa-moon"></i> Satellite</button>
+                <button class="btn btn-outline-secondary" id="btn-view-map" type="button"><i class="fa-regular fa-map me-1"></i>Map</button>
+                <button class="btn btn-outline-secondary" id="btn-view-satellite" type="button"><i class="fa-regular fa-moon me-1"></i>Satellite</button>
               </div>
             </div>
 
             <div id="results" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3"></div>
 
-            <div class="card mt-4 shadow-sm border-0">
-              <div class="card-body">
-                <h5 class="card-title">Can't find your business? Add it manually</h5>
-                <form id="manual-form" class="row g-3 needs-validation" novalidate>
+            <div class="card mt-5 shadow-sm border-0">
+              <div class="card-body p-4">
+                <h5 class="card-title mb-3">
+                  <i class="fa-solid fa-plus-circle text-primary me-2"></i>
+                  Can't find your business? Add it manually
+                </h5>
+                <form id="manual-form" class="row g-4 needs-validation" novalidate>
                   <div class="col-12 col-md-6">
                     <label class="form-label" for="mf-name">Business Name</label>
                     <input class="form-control" id="mf-name" required minlength="2" maxlength="100" placeholder="e.g., SalesQueen Bakery">
@@ -180,7 +185,9 @@
                     <textarea class="form-control" id="mf-notes" rows="3" maxlength="500" placeholder="Opening hours, specialties, etc."></textarea>
                   </div>
                   <div class="col-12">
-                    <button class="btn btn-success" type="submit">Save and Continue</button>
+                    <button class="btn btn-success btn-lg" type="submit">
+                      <i class="fa-solid fa-check me-2"></i>Save and Continue
+                    </button>
                   </div>
                 </form>
               </div>
@@ -195,8 +202,10 @@
       <!-- Phase 2: Get Quote -->
       <section id="phase-quote" class="bg-body-tertiary sq-section">
         <div class="container-xxl">
-          <h2 class="h4 mb-3">Get Quote</h2>
-          <p class="text-secondary mb-4">Customize features and receive an instant, transparent estimate.</p>
+          <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Get Quote</h2>
+            <p class="lead text-secondary">Customize features and receive an instant, transparent estimate</p>
+          </div>
 
           <!-- Stepper -->
           <div class="sq-stepper mb-3" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">
@@ -317,8 +326,10 @@
 
       <!-- Phase 3: Design Preview -->
       <section id="phase-design" class="container-xxl sq-section">
-        <h2 class="h4 mb-3">Design Preview</h2>
-        <p class="text-secondary mb-4">Create interactive website design previews. Drag components onto the canvas and customize styles in real time.</p>
+        <div class="text-center mb-5">
+          <h2 class="display-5 fw-bold mb-3">Design Preview</h2>
+          <p class="lead text-secondary">Create interactive website design previews. Drag components onto the canvas and customize styles in real time.</p>
+        </div>
         <div class="row g-4">
           <!-- Library -->
           <div class="col-12 col-xl-3">
