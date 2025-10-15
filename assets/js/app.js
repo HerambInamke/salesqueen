@@ -427,15 +427,49 @@
     SalesQueenStorage.save(project);
   }
 
-  // Mobile FAB behavior: quick scroll to active phase or add CTA on design
+  // Mobile navigation and FAB behavior
   const fab = document.getElementById('fab-action');
-  if (fab) {
-    function updateFabVisibility() {
-      const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+  const bottomNav = document.querySelector('.sq-bottom-nav');
+  
+  function updateMobileUI() {
+    const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+    if (fab) {
       fab.classList.toggle('d-none', !isMobile);
     }
-    updateFabVisibility();
-    window.addEventListener('resize', updateFabVisibility);
+    if (bottomNav) {
+      bottomNav.classList.toggle('d-none', !isMobile);
+    }
+  }
+  
+  updateMobileUI();
+  window.addEventListener('resize', updateMobileUI);
+
+  // Mobile bottom navigation
+  if (bottomNav) {
+    const bottomNavLinks = bottomNav.querySelectorAll('.nav-link');
+    bottomNavLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Remove active class from all links
+        bottomNavLinks.forEach(l => l.classList.remove('active'));
+        // Add active class to clicked link
+        link.classList.add('active');
+        
+        // Handle navigation
+        const href = link.getAttribute('href');
+        if (href && href !== '#') {
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+  }
+
+  // Mobile FAB behavior
+  if (fab) {
     fab.addEventListener('click', () => {
       // If on design, add CTA; else scroll to quote
       const onDesign = location.hash === '#phase-design' || document.activeElement.closest && document.activeElement.closest('#phase-design');
