@@ -497,12 +497,53 @@
       window.SalesQueenLead.set(saved.lead);
     }
   });
+  // Phone number validation function
+  function validatePhoneNumber(phone) {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+  }
+
   // Manual form validation + autosave
   const mf = document.getElementById('manual-form');
   if (mf) {
+    // Add real-time phone validation
+    const phoneInput = document.getElementById('mf-phone');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', (e) => {
+        const phone = e.target.value.replace(/\D/g, ''); // Remove non-digits
+        e.target.value = phone; // Update input to show only digits
+        
+        // Validate phone number
+        if (phone.length > 0 && !validatePhoneNumber(phone)) {
+          e.target.setCustomValidity('Phone number must be exactly 10 digits');
+        } else {
+          e.target.setCustomValidity('');
+        }
+      });
+
+      // Also validate on blur
+      phoneInput.addEventListener('blur', (e) => {
+        const phone = e.target.value;
+        if (phone.length > 0 && !validatePhoneNumber(phone)) {
+          e.target.setCustomValidity('Phone number must be exactly 10 digits');
+        } else {
+          e.target.setCustomValidity('');
+        }
+      });
+    }
+
     mf.addEventListener('submit', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      
+      // Additional phone validation before form submission
+      const phone = document.getElementById('mf-phone').value;
+      if (phone && !validatePhoneNumber(phone)) {
+        document.getElementById('mf-phone').setCustomValidity('Phone number must be exactly 10 digits');
+        mf.classList.add('was-validated');
+        return;
+      }
+      
       if (!mf.checkValidity()) {
         mf.classList.add('was-validated');
         return;
