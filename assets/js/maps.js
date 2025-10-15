@@ -1,54 +1,46 @@
-// Google Maps integration (optional if API key provided)
-// Exposes global callback SQ_initMap for Maps JS API to invoke
+// RapidAPI Google Maps Street View integration
 (() => {
-  let map, autocomplete, marker;
-  let infoWindow;
+  let mapEl, currentLocation = null;
   let businessMarkers = [];
   let lastQuery = '';
   let searchTimer;
 
+  // RapidAPI configuration
+  const RAPIDAPI_KEY = 'https://google-maps-api-free.p.rapidapi.com/google-find-place-search?place=sharma%20vishnu'; // Replace with your actual RapidAPI key
+  const RAPIDAPI_HOST = 'google-maps-api-free.p.rapidapi.com';
+
   function initMap() {
-    const mapEl = document.getElementById('map');
-    if (!mapEl || !window.google || !google.maps) return;
-    map = new google.maps.Map(mapEl, {
-      center: { lat: 20.5937, lng: 78.9629 }, // India center as neutral default
-      zoom: 5,
-      mapTypeControl: true,
-      streetViewControl: false,
-      fullscreenControl: true
-    });
-    infoWindow = new google.maps.InfoWindow();
+    mapEl = document.getElementById('map');
+    if (!mapEl) return;
+    
+    // Show placeholder with instructions
+    mapEl.innerHTML = `
+      <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+        <i class="fa-solid fa-map-location-dot text-primary mb-3" style="font-size: 3rem;"></i>
+        <h5 class="mb-2">Interactive Map</h5>
+        <p class="text-secondary mb-3">Search for a location to see the street view</p>
+        <small class="text-muted">Configure RapidAPI key in maps.js for full functionality</small>
+      </div>
+    `;
 
     const input = document.getElementById('place-input');
-    if (input && google.maps.places) {
-      autocomplete = new google.maps.places.Autocomplete(input, {
-        fields: ['geometry', 'formatted_address', 'name'],
-        types: ['geocode']
-      });
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (!place || !place.geometry) return;
-        focusPlace(place.geometry.location, place.name || place.formatted_address);
-        SalesQueenProgress.setStage('lead', 'in-progress');
+    if (input) {
+      input.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => runSearch(true), 380); // debounce
       });
     }
 
     const btn = document.getElementById('btn-search');
     btn && btn.addEventListener('click', () => runSearch());
 
-    const input = document.getElementById('place-input');
-    input && input.addEventListener('input', () => {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => runSearch(true), 380); // debounce
-    });
-
     const btnGeo = document.getElementById('btn-geolocate');
     btnGeo && btnGeo.addEventListener('click', locateUser);
 
     const btnMap = document.getElementById('btn-view-map');
     const btnSat = document.getElementById('btn-view-satellite');
-    btnMap && btnMap.addEventListener('click', () => map.setMapTypeId('roadmap'));
-    btnSat && btnSat.addEventListener('click', () => map.setMapTypeId('hybrid'));
+    btnMap && btnMap.addEventListener('click', () => showMapPlaceholder('Map view not available with Street View API'));
+    btnSat && btnSat.addEventListener('click', () => showMapPlaceholder('Satellite view not available with Street View API'));
   }
 
   function runSearch(isDebounced = false) {
@@ -56,102 +48,165 @@
     if (!query.trim()) return;
     if (isDebounced && query === lastQuery) return;
     lastQuery = query;
-    geocodeAddress(query);
+    searchLocation(query);
   }
 
-  function geocodeAddress(address) {
-    if (!google || !google.maps) return;
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address }, (results, status) => {
-      if (status === 'OK' && results[0]) {
-        const loc = results[0].geometry.location;
-        focusPlace(loc, results[0].formatted_address);
+  async function searchLocation(address) {
+    if (!RAPIDAPI_KEY || RAPIDAPI_KEY === 'YOUR_RAPIDAPI_KEY') {
+      showMapPlaceholder('Configure RapidAPI key for location search');
+      return;
+    }
+
+    try {
+      // Use Google Maps API Free to find places
+      const searchResponse = await fetch(`https://${RAPIDAPI_HOST}/google-find-place-search?place=${encodeURIComponent(address)}`, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': RAPIDAPI_HOST
+        }
+      });
+      
+      const searchData = await searchResponse.json();
+      if (searchData.candidates && searchData.candidates.length > 0) {
+        const place = searchData.candidates[0];
+        const location = place.geometry.location;
+        currentLocation = location;
+        await showStreetView(location, place.formatted_address || place.name);
         SalesQueenProgress.setStage('lead', 'in-progress');
-        searchNearbyBusinesses(loc);
+        await searchNearbyBusinesses(location, address);
       } else {
         alert('Location not found. Try refining your query.');
       }
-    });
+    } catch (error) {
+      console.error('Search error:', error);
+      alert('Unable to search location. Please try again.');
+    }
   }
 
-  function focusPlace(latLng, title) {
-    if (!map) return;
-    map.setCenter(latLng);
-    map.setZoom(13);
-    if (!marker) {
-      marker = new google.maps.Marker({ map });
+  async function showStreetView(location, title) {
+    if (!mapEl) return;
+    const { lat, lng } = location;
+    
+    if (!RAPIDAPI_KEY || RAPIDAPI_KEY === 'YOUR_RAPIDAPI_KEY') {
+      showMapPlaceholder('Configure RapidAPI key for Street View');
+      return;
     }
-    marker.setPosition(latLng);
-    marker.setTitle(title || '');
+
+    try {
+      const response = await fetch(`https://${RAPIDAPI_HOST}/maps/api/streetview?size=600x400&source=default&return_error_code=true&location=${lat},${lng}`, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': RAPIDAPI_HOST
+        }
+      });
+      
+      if (response.ok) {
+        const imageBlob = await response.blob();
+        const imageUrl = URL.createObjectURL(imageBlob);
+        
+        mapEl.innerHTML = `
+          <div class="position-relative">
+            <img src="${imageUrl}" alt="Street view of ${title}" class="img-fluid rounded w-100" style="height: 400px; object-fit: cover;">
+            <div class="position-absolute top-0 start-0 p-3">
+              <div class="bg-white rounded shadow-sm p-2">
+                <h6 class="mb-1">${title}</h6>
+                <small class="text-muted">Street View</small>
+              </div>
+            </div>
+            <div class="position-absolute bottom-0 end-0 p-3">
+              <button class="btn btn-sm btn-primary" onclick="window.SQ_toast && window.SQ_toast('Location saved to project')">
+                <i class="fa-solid fa-bookmark me-1"></i> Save Location
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        showMapPlaceholder('Street View not available for this location');
+      }
+    } catch (error) {
+      console.error('Street View error:', error);
+      showMapPlaceholder('Unable to load Street View');
+    }
+  }
+
+  function showMapPlaceholder(message) {
+    if (!mapEl) return;
+    mapEl.innerHTML = `
+      <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+        <i class="fa-solid fa-map-location-dot text-primary mb-3" style="font-size: 3rem;"></i>
+        <h5 class="mb-2">Map Unavailable</h5>
+        <p class="text-secondary mb-3">${message}</p>
+        <small class="text-muted">Search will work with basic functionality</small>
+      </div>
+    `;
   }
 
   function locateUser() {
     if (!navigator.geolocation) return alert('Geolocation is not supported.');
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const latLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      focusPlace(latLng, 'My Location');
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      currentLocation = location;
+      await showStreetView(location, 'My Location');
       SalesQueenProgress.setStage('lead', 'in-progress');
-      searchNearbyBusinesses(latLng);
+      await searchNearbyBusinesses(location, 'My Location');
     }, () => alert('Unable to access your location.'), { enableHighAccuracy: true, timeout: 8000 });
   }
 
-  function clearBusinessMarkers() {
-    businessMarkers.forEach(m => m.setMap(null));
-    businessMarkers = [];
-  }
+  async function searchNearbyBusinesses(location, searchTerm = '') {
+    if (!RAPIDAPI_KEY || RAPIDAPI_KEY === 'YOUR_RAPIDAPI_KEY') {
+      // Mock business data for demonstration when no API key
+      const mockBusinesses = [
+        { name: 'Sample Restaurant', vicinity: '123 Main St', rating: 4.5, user_ratings_total: 120, website: 'https://example.com' },
+        { name: 'Local Cafe', vicinity: '456 Oak Ave', rating: 4.2, user_ratings_total: 85, website: null },
+        { name: 'Business Center', vicinity: '789 Pine St', rating: 4.8, user_ratings_total: 200, website: 'https://business.com' }
+      ];
+      renderResults(mockBusinesses);
+      return;
+    }
 
-  function searchNearbyBusinesses(latLng) {
-    if (!google.maps.places) return;
-    clearBusinessMarkers();
-    const service = new google.maps.places.PlacesService(map);
-    const industry = (document.getElementById('industry-filter') || {}).value || '';
-    const request = {
-      location: latLng,
-      radius: 3000,
-      type: industry ? [industry] : undefined,
-      keyword: industry || undefined
-    };
-    service.nearbySearch(request, (results, status) => {
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !results) return;
-      renderResults(results);
-      results.slice(0, 12).forEach(place => addBusinessMarker(place));
-    });
-  }
-
-  function addBusinessMarker(place) {
-    const m = new google.maps.Marker({
-      map,
-      position: place.geometry.location,
-      title: place.name,
-      icon: {
-        url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+    try {
+      // Use Google Maps API Free to search for nearby businesses
+      const industry = (document.getElementById('industry-filter') || {}).value || '';
+      const searchQuery = industry ? `${industry} near ${searchTerm}` : `businesses near ${searchTerm}`;
+      
+      const nearbyResponse = await fetch(`https://${RAPIDAPI_HOST}/google-find-place-search?place=${encodeURIComponent(searchQuery)}`, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': RAPIDAPI_HOST
+        }
+      });
+      
+      const nearbyData = await nearbyResponse.json();
+      if (nearbyData.candidates && nearbyData.candidates.length > 0) {
+        // Format the results for display
+        const formattedPlaces = nearbyData.candidates.slice(0, 12).map(place => ({
+          name: place.name || 'Unknown Business',
+          vicinity: place.formatted_address || place.vicinity || 'Address not available',
+          rating: place.rating || 0,
+          user_ratings_total: place.user_ratings_total || 0,
+          website: place.website || null,
+          place_id: place.place_id
+        }));
+        
+        renderResults(formattedPlaces);
+      } else {
+        renderResults([]);
       }
-    });
-    m.addListener('click', () => openInfo(place, m));
-    businessMarkers.push(m);
+    } catch (error) {
+      console.error('Nearby search error:', error);
+      // Fallback to mock data
+      const mockBusinesses = [
+        { name: 'Sample Restaurant', vicinity: '123 Main St', rating: 4.5, user_ratings_total: 120, website: 'https://example.com' },
+        { name: 'Local Cafe', vicinity: '456 Oak Ave', rating: 4.2, user_ratings_total: 85, website: null },
+        { name: 'Business Center', vicinity: '789 Pine St', rating: 4.8, user_ratings_total: 200, website: 'https://business.com' }
+      ];
+      renderResults(mockBusinesses);
+    }
   }
 
-  function openInfo(place, m) {
-    const rating = place.rating ? `⭐ ${place.rating} (${place.user_ratings_total || 0})` : 'No ratings';
-    const website = place.website ? `<a href="${place.website}" target="_blank" rel="noopener">Website</a>` : '';
-    const content = `
-      <div style="max-width:240px">
-        <strong>${escapeHtml(place.name)}</strong><br>
-        <span>${escapeHtml(place.vicinity || place.formatted_address || '')}</span><br>
-        <small>${rating}</small><br>
-        <div class="mt-1">${website}</div>
-        <div class="mt-2">
-          <button class="btn btn-sm btn-primary" id="iw-cta-claim">This is My Business</button>
-        </div>
-      </div>`;
-    infoWindow.setContent(content);
-    infoWindow.open({ map, anchor: m });
-    // Defer binding after DOM is set in InfoWindow
-    setTimeout(() => {
-      const btn = document.getElementById('iw-cta-claim');
-      if (btn) btn.addEventListener('click', () => claimBusiness(place));
-    }, 0);
-  }
 
   function renderResults(places) {
     const grid = document.getElementById('results');
@@ -189,15 +244,15 @@
   }
 
   function referBusiness(place) {
-    showToast('Referral captured. We will follow up.');
+    (window.SQ_toast || ((m)=>alert(m)))('Referral captured. We will follow up.');
   }
 
   function escapeHtml(str) {
     return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   }
 
-  // Expose callback for Google Maps script
-  window.SQ_initMap = initMap;
+  // Initialize on DOM ready
+  document.addEventListener('DOMContentLoaded', initMap);
 })();
 
 
